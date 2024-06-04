@@ -80,10 +80,7 @@ def is_point_inside_box(point, box):
     return (abs(rotated_point[0]) <= l / 2) and (abs(rotated_point[1]) <= w / 2) and (abs(rotated_point[2]) <= h / 2)
 
 def save_points_to_bin(points, output_dir, file_name):
-    # 파일 경로 생성
     file_path = os.path.join(output_dir, file_name)
-
-    # 포인트들을 NumPy 배열로 변환하고 파일로 저장
     np.array(points, dtype=np.float32).tofile(file_path)
 
 
@@ -116,7 +113,7 @@ def main():
     real_cyc_count = 0
 
     total_bounding_boxes = 0
-    fake_car_info = []  # 가짜 객체 정보를 저장하는 리스트
+    fake_car_info = [] 
     fake_ped_info = []
     fake_cyc_info = []
 
@@ -141,7 +138,7 @@ def main():
             total_bounding_boxes += len(bounding_boxes)
 
             file_name = demo_dataset.sample_file_list[idx]
-            file_name = os.path.basename(file_name)  # 전체 경로에서 파일 이름만 추출
+            file_name = os.path.basename(file_name)
 
             points_in_boxes = [[] for _ in bounding_boxes]
             for p in data_dict['points']:
@@ -152,13 +149,8 @@ def main():
 
             for idx, pts in enumerate(points_in_boxes):
 
-                # 바운딩 박스 처리 시작 전에 temppointlist 배열 초기화
                 temppointlist_all = []
-
-                # 각 포인트들의 좌표(x, y, z)와 강도(i)를 포함하는 배열 생성
                 box_points = np.array([[p[0], p[1], p[2], p[3]] for p in pts])
-
-                # 각 포인트의 intensity만 추출하여 배열 생성
                 intensity = np.array([p[3] for p in pts])
 
                 num_points = len(box_points)
@@ -204,7 +196,6 @@ def main():
 
                     count_greater, count_lesser_or_equal, percentage_greater
 
-                    #공격 탐지
                     if class_name == 'Car' :
 
                         if percentage_greater <= 60 :
@@ -256,13 +247,11 @@ def main():
 
         print(distances.keys())
 
-    # 각 카테고리별 비율 계산 전 분모 검사 추가
     car_percentage = (fake_car_count / (fake_car_count + real_car_count)) * 100 if (fake_car_count + real_car_count) > 0 else 0
     ped_percentage = (fake_ped_count / (fake_ped_count + real_ped_count)) * 100 if (fake_ped_count + real_ped_count) > 0 else 0
     cyc_percentage = (fake_cyc_count / (fake_cyc_count + real_cyc_count)) * 100 if (fake_cyc_count + real_cyc_count) > 0 else 0
     total_percentage = ((fake_car_count + fake_ped_count + fake_cyc_count) / (fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count)) * 100 if (fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count) > 0 else 0
 
-    # 결과 출력
     print(f"Total number of bounding boxes: {total_bounding_boxes}")
     print(f"Number of fake cars: {fake_car_count} / {fake_car_count + real_car_count}({car_percentage:.2f}%)")
     print(f"Number of fake pedestrians: {fake_ped_count} / {fake_ped_count + real_ped_count}({ped_percentage:.2f}%)")
