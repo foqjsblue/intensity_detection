@@ -2,9 +2,9 @@
 
 An intensity-based defense method for detecting fake objects injected by laser-based attackers in LiDAR point clouds.
 
-save_box_fake.py : Stage 1 -> Threshold-based Classification
+save_box_fake.py : Stage 1 (Threshold-based Classification)
 
-pytorch_kitti/main.py : Stage2 -> DGCNN-based Classification
+pytorch_kitti/main.py : Stage2 (DGCNN-based Classification)
 
 sn2_final.py : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the performance for Scenario 2 
 
