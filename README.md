@@ -3,6 +3,8 @@
 An intensity-based defense method for detecting fake objects injected by laser-based attackers in LiDAR point clouds.
 
 
+All these files must be located in OpenPCDet/tools after installing OpenPCDet via Docker.
+
 
 **save_box_fake.py** : Stage 1 (Threshold-based Classification)
 
