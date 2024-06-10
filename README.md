@@ -10,7 +10,9 @@ All these files must be located in OpenPCDet/tools after installing OpenPCDet vi
 
 **pytorch_kitti/main.py** : Stage2 (DGCNN-based Classification)
 
-**sn2_final.py** : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the performance for Scenario 2 
+rotate.py : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
+
+**sn2_final.py** : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the performance for Scenario 2
 
 
 The code is developed based on [OpenPCDet](https://github.com/open-mmlab/OpenPCDet).
