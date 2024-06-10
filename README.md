@@ -5,6 +5,8 @@ An intensity-based defense method for detecting fake objects injected by laser-b
 
 All these files must be located in OpenPCDet/tools after installing OpenPCDet via Docker.
 
+https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d
+
 
 **save_box_fake.py** : Stage 1 (Threshold-based Classification)
 
