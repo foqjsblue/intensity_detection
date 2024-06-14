@@ -13,12 +13,13 @@ https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d
 **pytorch_kitti/main.py** : Stage2 (DGCNN-based Classification)
 
 attack_class.py : pillar 기반 객체탐지 알고리즘에 대한 최적화 공격
+-> OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py 수정 후, 실행 가능
 
 rotate.py : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
 
 **sn2_final.py** : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the performance for Scenario 2
 
-OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py 수정
+
 
 The code is developed based on [OpenPCDet](https://github.com/open-mmlab/OpenPCDet).
 
