@@ -18,6 +18,7 @@ rotate.py : By using object files (bin) as input, augmented data with random yaw
 
 **sn2_final.py** : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the performance for Scenario 2
 
+OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py → gt_boxes 수정
 
 The code is developed based on [OpenPCDet](https://github.com/open-mmlab/OpenPCDet).
 
