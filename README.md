@@ -12,7 +12,7 @@ https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d
 
 **pytorch_kitti/main.py** : Stage2 (DGCNN-based Classification)
 
-attack_class.py
+attack_class.py : pillar 기반 객체탐지 알고리즘에 대한 최적화 공격
 
 rotate.py : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
 
