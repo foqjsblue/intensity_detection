@@ -20,8 +20,6 @@ def modify_intensity(input_folder, output_folder):
         output_file_path = output_folder / file_path.name
         points.tofile(output_file_path)
 
-
-# 사용 예시
 input_folder = 'kitti_box/box_cyc/testing/box_cyc_test'  # The input folder path containing the .bin files
 output_folder = 'kitti_box/box_cyc/testing/box_cyc_test_rd027039'  # The output folder path where the modified .bin files will be saved
 
