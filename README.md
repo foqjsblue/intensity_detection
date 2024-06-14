@@ -25,4 +25,6 @@ This project is inspired by and builds upon the methods described in the [WangYu
 
 명령어 / 파일 설명
 
+시나리오 1, 2 설명
+
 주석 한글 -> 영어
