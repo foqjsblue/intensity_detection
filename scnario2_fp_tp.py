@@ -73,11 +73,11 @@ def calculate_tp_fp(objects_normal, objects_attacked, objects_detected, distance
     # 공격 후 중심점 개수 - 탐지 후 중심점 개수 = 탐지법이 사라지게 한 바운딩 박스 개수 (FP의 최댓값)
     max_fp = len(objects_attacked) - len(objects_detected)
 
-    # 공격 후 중심점과 공격 전 중심점 비교: 공격 후에 생긴 중심점
+    # Compare the centroids after the attack with the centroids before the attack: centroids that appeared after the attack
     added_centroids = [box[:3] for box in objects_attacked if
                        not any(np.allclose(box[:3], obj[:3], atol=distance_threshold) for obj in objects_normal)]
 
-    # TP: 공격 후에 생긴 중심점이 탐지 후에 사라졌다면 TP 증가
+    # TP: If a centroid that appeared after the attack disappears after detection, increase TP
     tp = sum(1 for centroid in added_centroids if
              not any(np.allclose(centroid, det[:3], atol=distance_threshold) for det in objects_detected))
 
