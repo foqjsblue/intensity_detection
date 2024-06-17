@@ -33,3 +33,5 @@ This project is inspired by and builds upon the methods described in the [WangYu
 주석 한글 -> 영어
 
 공격데이터셋 만드는 법
+
+https://github.com/Eaphan/Robust3DOD
