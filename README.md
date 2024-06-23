@@ -13,9 +13,6 @@ KITTI Dataset 사용
 
 **pytorch_kitti/main.py** : Stage2 (DGCNN-based Classification)
 
-attack_class.py : pillar 기반 객체탐지 알고리즘에 대한 최적화 공격
--> OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py 수정 후, 실행 가능
-
 rotate.py : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
 
 **sn2_final.py** : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the performance for Scenario 2
@@ -28,10 +25,17 @@ This project is inspired by and builds upon the methods described in the [WangYu
 
 명령어 / 파일 설명
 
-시나리오 1, 2 설명
+Scenario 1: A situation where there is only one object on the road
+
+Scenario 2: A situation where there are multiple normal objects and one fake object is injected
 
 주석 한글 -> 영어
 
-공격데이터셋 만드는 법
+Code to create fake objects
+
+attack_class.py: An optimized attack on a pillar-based object detection algorithm.
+Modify OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py and then execute.
+Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 
 https://github.com/Eaphan/Robust3DOD
+
