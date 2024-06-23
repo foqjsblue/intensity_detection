@@ -19,7 +19,6 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 The code is developed based on [OpenPCDet](https://github.com/open-mmlab/OpenPCDet).
 
-This project is inspired by and builds upon the methods described in the [WangYueFt/dgcnn repository](https://github.com/WangYueFt/dgcnn).
 
 명령어 / 파일 설명
 
