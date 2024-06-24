@@ -94,7 +94,7 @@ def main():
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
     #logger.info(f'Total number of samples: \t{len(demo_dataset)}')
-    total_samples = len(demo_dataset)  # 전체 샘플의 수
+    total_samples = len(demo_dataset)
     logger.info(f'Total number of samples: \t{total_samples}')
 
     model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=demo_dataset)
@@ -117,7 +117,6 @@ def main():
     fake_ped_info = []
     fake_cyc_info = []
 
-    # 바운딩 박스를 위한 전역 카운터
     global_box_counters = {'Car': 1, 'Pedestrian': 1, 'Cyclist': 1}
 
     with (((torch.no_grad()))):
