@@ -26,11 +26,11 @@ class BoundingBoxDataset(Dataset):
         self.frame_ids = list(self.file_mapping.keys())
         self.label_mapping = {'Normal Object': 0, 'Fake Object': 1}
         
-        # Stage 1의 frame_id 로그 확인 ####
+        # Check the log of frame_id for Stage 1 ####
         for item in self.data: ####
             print(f"Stage 1 Frame ID: {item.get('frame_id')}, Box Center: {item['box_center']}") ####
         
-        # file_mapping 로그 확인 ####
+        # Check the log for file_mapping ####
         #print(f"file_mapping: {self.file_mapping}") ####
 
     def __len__(self):
@@ -44,12 +44,12 @@ class BoundingBoxDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data[idx]
-        frame_id = item['frame_id']  # Stage 1의 frame_id를 그대로 사용
+        frame_id = item['frame_id']  # Use the frame_id from Stage 1 as-is
 
         if frame_id not in self.file_mapping:
             raise FileNotFoundError(f"No such file for frame_id {frame_id}. Available frame_ids: {self.frame_ids}")
 
-        if item['label'] != 'normal':  # 'normal' label만 처리 ####
+        if item['label'] != 'normal':  # Process only the 'normal' label ####
             return None
 
         points_in_box = np.array(item['points'])
@@ -58,7 +58,7 @@ class BoundingBoxDataset(Dataset):
         if points_in_box.ndim == 1:
             points_in_box = points_in_box.reshape(-1, 4)
 
-        # Intensity 값 (pointcloud의 마지막 열)의 범위를 0-1에서 0-255로 조정
+        # Adjust the intensity values (last column of the point cloud) from the range 0-1 to 0-255
         points_in_box[:, 3] = points_in_box[:, 3] * 255
 
         points_in_box = self.pad_pointcloud(points_in_box)
@@ -67,7 +67,7 @@ class BoundingBoxDataset(Dataset):
         return torch.from_numpy(points_in_box).float(), torch.tensor(label).long(), torch.tensor(frame_id).long(), torch.tensor(len(item['points'])).long(), torch.from_numpy(np.concatenate([item['box_center'], item['box_dims'], [item['box_yaw']]])).float(), item['box_center'], item['file_name'], item['points']
 
 def custom_collate_fn(batch):
-    batch = list(filter(lambda x: x is not None, batch))  # 'None' 항목 필터링 ####
+    batch = list(filter(lambda x: x is not None, batch))  # Filter out 'None' entries ####
     if len(batch) == 0:
         return None
 
@@ -126,7 +126,7 @@ def evaluate(args, test_loader, model, device):
 
             for i in range(len(frame_id)):
                 if frame_id[i] == 0:
-                    frame_id[i] = int(file_names[i].split('_')[1].split('.')[0])  # file_name에서 frame_id 추출
+                    frame_id[i] = int(file_names[i].split('_')[1].split('.')[0])  # Extract the frame_id from the file_name
                 
                 bounding_boxes = boxes[i].cpu().numpy().reshape(-1, 7)
                 
@@ -143,7 +143,7 @@ def evaluate(args, test_loader, model, device):
                 })
                 output_box_count += 1  # Count the number of output boxes
 
-                # Stage 2의 frame_id 로그 확인 ####
+                # Check the log for frame_id in Stage 2 ####
                 print(f"Stage 2 Frame ID: {frame_id[i]}, Pred: {preds[i].cpu().numpy()}, Num Points: {num_points_in_box[i].cpu().numpy()}, Box Center: {centers[i]}, File Name: {file_names[i]}") ####
 
     return results, input_box_count, output_box_count
