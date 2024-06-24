@@ -70,7 +70,7 @@ def count_objects(data_dict, model):
 
 
 def calculate_tp_fp(objects_normal, objects_attacked, objects_detected, distance_threshold=0.0):
-    # 공격 후 중심점 개수 - 탐지 후 중심점 개수 = 탐지법이 사라지게 한 바운딩 박스 개수 (FP의 최댓값)
+    # Number of centroids after attack - Number of centroids after detection = Maximum number of bounding boxes that the detection method caused to disappear (maximum FP)
     max_fp = len(objects_attacked) - len(objects_detected)
 
     # Compare the centroids after the attack with the centroids before the attack: centroids that appeared after the attack
@@ -81,11 +81,11 @@ def calculate_tp_fp(objects_normal, objects_attacked, objects_detected, distance
     tp = sum(1 for centroid in added_centroids if
              not any(np.allclose(centroid, det[:3], atol=distance_threshold) for det in objects_detected))
 
-    tp = min(tp, 1)  # TP가 1을 초과하지 않도록 설정
+    tp = min(tp, 1)
 
-    # 최종 FP = 탐지법이 사라지게 한 바운딩 박스 개수 - TP
+    # Final FP = Number of bounding boxes that the detection method caused to disappear - TP
     fp = max_fp - tp
-    fp = max(fp, 0)  # FP가 음수가 되지 않도록 설정
+    fp = max(fp, 0)
 
     return tp, fp, len(objects_detected), max_fp
 
@@ -124,7 +124,7 @@ def main():
     add_files_to_group(dataset_attacked.sample_file_list, 'attacked')
     add_files_to_group(dataset_detected.sample_file_list, 'detected')
 
-    # 디버깅 출력: 파일 그룹 확인
+    # Debugging output: Check file groups
     for base_name, paths in file_groups.items():
         logger.info(f"File group: {base_name}, Paths: {paths}")
 
