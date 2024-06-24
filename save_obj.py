@@ -92,11 +92,9 @@ def is_point_inside_box(point, box):
 
 
 def find_nearest_neighbors(points, k=10):
-    # 포인트 세트의 크기가 k보다 작은 경우 빈 리스트 반환
     if len(points) < k:
         return []
 
-    # 리스트를 NumPy 배열로 변환
     points_array = np.array(points)
 
     nbrs = NearestNeighbors(n_neighbors=k, algorithm='kd_tree').fit(points_array[:, :3])
@@ -110,7 +108,6 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
     for i_knn, point in enumerate(points):
         if i_knn < len(neighbors_indices):
             neighbor_idxs = neighbors_indices[i_knn]
-            # 각 이웃의 인덱스를 사용하여 이웃 포인트들을 선택
             neighbors = [points[idx] for idx in neighbor_idxs]
 
             if all(abs(point[3] - neighbor[3]) <= intensity_threshold for neighbor in neighbors):
@@ -121,10 +118,7 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
     return count_knn, avg_intensity_knn
 
 def save_points_to_bin(points, output_dir, file_name):
-    # 파일 경로 생성
     file_path = os.path.join(output_dir, file_name)
-
-    # 포인트들을 NumPy 배열로 변환하고 파일로 저장
     np.array(points, dtype=np.float32).tofile(file_path)
 
 
@@ -138,7 +132,7 @@ def main():
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
     #logger.info(f'Total number of samples: \t{len(demo_dataset)}')
-    total_samples = len(demo_dataset)  # 전체 샘플의 수
+    total_samples = len(demo_dataset)
     logger.info(f'Total number of samples: \t{total_samples}')
 
     model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=demo_dataset)
@@ -151,16 +145,7 @@ def main():
 
 #####################################################################################################################
 
-    temppointlist = []
-    fake_car_count = 0
-    real_car_count = 0
-    fake_ped_count = 0
-    real_ped_count = 0
-    fake_cyc_count = 0
-    real_cyc_count = 0
-
     total_bounding_boxes = 0
-
     global_box_counters = {'Car': 1, 'Pedestrian': 1, 'Cyclist': 1}
 
     with (((torch.no_grad()))):
@@ -209,8 +194,6 @@ def main():
 
         print(distances.keys())
 
-
-    # 결과 출력
     print(f"Total number of bounding boxes: {total_bounding_boxes}")
     #print(f"▶ Number of bounding boxes saved: {global_box_counter - 1}")
     for class_name, counter in global_box_counters.items():
