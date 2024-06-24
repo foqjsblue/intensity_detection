@@ -99,11 +99,11 @@ def is_point_inside_box(point, box):
 
 
 def find_nearest_neighbors(points, k=3):
-    # 포인트 세트의 크기가 k보다 작은 경우 빈 리스트 반환
+    # If the size of the point set is less than k, return an empty list
     if len(points) < k:
         return []
 
-    # 리스트를 NumPy 배열로 변환
+    # Convert the list to a NumPy array
     points_array = np.array(points)
 
     nbrs = NearestNeighbors(n_neighbors=k, algorithm='kd_tree').fit(points_array[:, :3])
@@ -117,7 +117,7 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
     for i_knn, point in enumerate(points):
         if i_knn < len(neighbors_indices):
             neighbor_idxs = neighbors_indices[i_knn]
-            # 각 이웃의 인덱스를 사용하여 이웃 포인트들을 선택
+            # Select neighbor points using the indices of each neighbor
             neighbors = [points[idx] for idx in neighbor_idxs]
 
             if all(abs(point[3] - neighbor[3]) <= intensity_threshold for neighbor in neighbors):
@@ -132,10 +132,9 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
 
 def save_points_to_bin(points, output_dir, file_name):
 
-    # 파일 경로 생성
     file_path = os.path.join(output_dir, file_name)
 
-    # 포인트들을 NumPy 배열로 변환하고 파일로 저장
+    # Convert the points to a NumPy array and save to a file
     np.array(points, dtype=np.float32).tofile(file_path)
 
 
@@ -183,7 +182,7 @@ def main():
     real_cyc_count = 0
 
     total_bounding_boxes = 0
-    fake_car_info = []  # 가짜 객체 정보를 저장하는 리스트
+    fake_car_info = []  # A list to store fake object information
     fake_ped_info = []
     fake_cyc_info = []
 
@@ -203,7 +202,7 @@ def main():
             total_bounding_boxes += len(bounding_boxes)
 
             file_name = demo_dataset.sample_file_list[idx]
-            file_name = os.path.basename(file_name)  # 전체 경로에서 파일 이름만 추출
+            file_name = os.path.basename(file_name)  # Extract only the file name from the full path
 
 
             points_in_boxes = [[] for _ in bounding_boxes]
@@ -216,7 +215,7 @@ def main():
             label_idx = class_labels[idx] - 1
             class_name = cfg.CLASS_NAMES[label_idx] if label_idx < len(cfg.CLASS_NAMES) else "UNKNOWN"
 
-            #바운딩 박스 저장
+            # Save the bounding box
             #output_dir = '../output_box_002741'
             #if not os.path.exists(output_dir):
                 #os.makedirs(output_dir)
@@ -229,16 +228,16 @@ def main():
 
             for idx, pts in enumerate(points_in_boxes):
 
-                # 바운딩 박스 처리 시작 전에 temppointlist 배열 초기화
+                # Initialize the temppointlist array before starting bounding box processing
                 temppointlist = []
                 temppointlist3 = []
                 temppointlist_all = []
 
-                # 각 포인트들의 좌표(x, y, z)와 강도(i)를 포함하는 배열 생성
+                # Create an array containing the coordinates (x, y, z) and intensity (i) of each point
                 box_points = np.array([[p[0], p[1], p[2], p[3]] for p in pts if p[3] != 0.0])
                 #print(box_points.shape)
 
-                # 각 포인트의 강도(intensity)만 추출하여 배열 생성
+                # Create an array by extracting only the intensity of each point
                 intensity = np.array([p[3] for p in pts])
 
                 num_points = len(box_points)
@@ -265,7 +264,7 @@ def main():
                 for p in pts :
                     temppointlist_all.append(p[3])
 
-                # temppointlist의 길이가 10 이상일 때만 유사 강도를 가진 이웃 포인트 계산 및 출력
+                # Calculate and print neighbor points with similar intensities only if the length of temppointlist is 10 or more
                 if len(box_points) >= 10:
                     neighbors_indices = find_nearest_neighbors(box_points)
                     count_knn, avg_similar_intensity = count_similar_intensity_points(box_points, neighbors_indices)
@@ -284,7 +283,7 @@ def main():
                     top_percentage = 0.0
                     bottom_percentage = 0.0
 
-                    # 상위 및 하위 퍼센트에 해당하는 요소의 수를 계산
+                    # Calculate the number of elements corresponding to the top and bottom percentiles
                     num_elements = len(temppointlist2)
                     num_to_remove_top = int(num_elements * top_percentage)
                     num_to_remove_bottom = int(num_elements * bottom_percentage)
@@ -305,7 +304,6 @@ def main():
 
                     mode_intensity_str = f"{mode_intensity:.2f}" if mode_intensity is not None else "N/A"
 
-                    #20개만 출력
                     print("\n")
 
                     if len(temppointlist2) > 20:
@@ -328,17 +326,17 @@ def main():
                     distances[class_name].append(distance)
                     intensities[class_name].append(avg_intensity)
 
-                    # 왜도와 첨도 계산
+                    # Calculate skewness and kurtosis
                     box_skewness = skew(intensity)
                     box_kurtosis = kurtosis(intensity)
                     
-                    #정보값 출력
+                    
                     print(f"Box {idx + 1} ({class_name}): Number of all points = {num_points + zero_num_points}, Number of non-zero points = {num_points}, Number of zero-intensity points = {zero_num_points}")
-                    # mode_intensity 출력 부분
+                    
                     mode_intensity_str = f"{mode_intensity:.2f}" if mode_intensity is not None else "N/A"
                     print(f"Average intensity = {avg_intensity:.2f} ({std_intensity:.2f}), Median intensity = {med_intensity:.2f}, Mode intensity = {mode_intensity_str}, Distance: {distance:.2f} meters")
                     #print("\n")
-                    # 계산된 왜도와 첨도 출력
+                    
                     print(f"Box {idx + 1} → Skewness = {box_skewness:.2f}, Kurtosis = {box_kurtosis:.2f}")
 
                     # Convert string values to float
@@ -358,7 +356,7 @@ def main():
                     print(f"Box {idx + 1} → Retro-reflector : {count_greater}, Diffuse reflector : {count_lesser_or_equal}, Ratio of retro-reflector : {percentage_greater:.2f}%")
                     print("\n")
 
-                    # 공격 탐지
+                    # Attack detection
                     if class_name == 'Car' and len(temppointlist) >= 10:
                         
                         if percentage_greater >= 60 :
