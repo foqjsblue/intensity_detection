@@ -32,14 +32,6 @@ from pcdet.utils import common_utils
 
 class DemoDataset(DatasetTemplate):
     def __init__(self, dataset_cfg, class_names, training=True, root_path=None, logger=None, ext='.bin'):
-        """
-        Args:
-            root_path:
-            dataset_cfg:
-            class_names:
-            training:
-            logger:
-        """
         super().__init__(
             dataset_cfg=dataset_cfg, class_names=class_names, training=training, root_path=root_path, logger=logger
         )
@@ -100,11 +92,9 @@ def is_point_inside_box(point, box):
 
 
 def find_nearest_neighbors(points, k=10):
-    # 포인트 세트의 크기가 k보다 작은 경우 빈 리스트 반환
     if len(points) < k:
         return []
 
-    # 리스트를 NumPy 배열로 변환
     points_array = np.array(points)
 
     nbrs = NearestNeighbors(n_neighbors=k, algorithm='kd_tree').fit(points_array[:, :3])
@@ -118,7 +108,6 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
     for i_knn, point in enumerate(points):
         if i_knn < len(neighbors_indices):
             neighbor_idxs = neighbors_indices[i_knn]
-            # 각 이웃의 인덱스를 사용하여 이웃 포인트들을 선택
             neighbors = [points[idx] for idx in neighbor_idxs]
 
             if all(abs(point[3] - neighbor[3]) <= intensity_threshold for neighbor in neighbors):
@@ -128,23 +117,9 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
     avg_intensity_knn = total_intensity / count_knn if count_knn > 0 else 0
     return count_knn, avg_intensity_knn
 
-
-
-
 def save_points_to_bin(points, output_dir, file_name):
-    """
-    주어진 포인트들을 .bin 파일로 저장합니다.
-    Args:
-        points (list): 저장할 포인트들의 리스트. 각 포인트는 [x, y, z, intensity] 형태를 가집니다.
-        output_dir (str): 저장할 파일이 위치할 디렉토리.
-        file_name (str): 저장할 파일의 이름.
-    """
-    # 파일 경로 생성
     file_path = os.path.join(output_dir, file_name)
-
-    # 포인트들을 NumPy 배열로 변환하고 파일로 저장
     np.array(points, dtype=np.float32).tofile(file_path)
-
 
 def main():
     args, cfg = parse_config()
@@ -156,7 +131,7 @@ def main():
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
     #logger.info(f'Total number of samples: \t{len(demo_dataset)}')
-    total_samples = len(demo_dataset)  # 전체 샘플의 수
+    total_samples = len(demo_dataset)
     logger.info(f'Total number of samples: \t{total_samples}')
 
     model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=demo_dataset)
@@ -169,7 +144,7 @@ def main():
     temppointlist = []
 
     total_bounding_boxes = 0
-    fake_car_info = []  # 가짜 객체 정보를 저장하는 리스트
+    fake_car_info = []
     fake_ped_info = []
     fake_cyc_info = []
 
@@ -193,7 +168,7 @@ def main():
             total_bounding_boxes += len(bounding_boxes)
 
             file_name = demo_dataset.sample_file_list[idx]
-            file_name = os.path.basename(file_name)  # 전체 경로에서 파일 이름만 추출
+            file_name = os.path.basename(file_name)
 
             points_in_boxes = [[] for _ in bounding_boxes]
             for p in data_dict['points']:
@@ -204,15 +179,12 @@ def main():
 
             for idx, pts in enumerate(points_in_boxes):
 
-                # 바운딩 박스 처리 시작 전에 temppointlist 배열 초기화
                 temppointlist = []
                 temppointlist3 = []
                 temppointlist_all = []
 
-                # 각 포인트들의 좌표(x, y, z)와 강도(i)를 포함하는 배열 생성
                 box_points = np.array([[p[0], p[1], p[2], p[3]] for p in pts if p[3] != 0.0])
 
-                # 각 포인트의 강도(intensity)만 추출하여 배열 생성
                 intensity = np.array([p[3] for p in pts])
 
                 num_points = len(box_points)
@@ -239,7 +211,6 @@ def main():
                 for p in pts :
                     temppointlist_all.append(p[3])
 
-                # temppointlist의 길이가 10 이상일 때만 유사 강도를 가진 이웃 포인트 계산 및 출력
                 if len(box_points) >= 10:
                     neighbors_indices = find_nearest_neighbors(box_points)
                     count_knn, avg_similar_intensity = count_similar_intensity_points(box_points, neighbors_indices)
@@ -258,7 +229,6 @@ def main():
                     top_percentage = 0.0
                     bottom_percentage = 0.0
 
-                    # 상위 및 하위 퍼센트에 해당하는 요소의 수를 계산
                     num_elements = len(temppointlist2)
                     num_to_remove_top = int(num_elements * top_percentage)
                     num_to_remove_bottom = int(num_elements * bottom_percentage)
@@ -279,7 +249,6 @@ def main():
 
                     mode_intensity_str = f"{mode_intensity:.2f}" if mode_intensity is not None else "N/A"
 
-
                     avg_intensity = np.mean(temppointlist_all)
                     std_intensity = np.std(temppointlist2)
                     med_intensity = np.median(temppointlist2)
@@ -291,18 +260,16 @@ def main():
                     distances[class_name].append(distance)
                     intensities[class_name].append(avg_intensity)
 
-                    # 왜도와 첨도 계산
                     box_skewness = skew(intensity)
                     box_kurtosis = kurtosis(intensity)
                     
-                    #정보값 출력
                     #print(f"Box {idx + 1} ({class_name}): Number of all points = {num_points + zero_num_points}, Number of non-zero points = {num_points}, Number of zero-intensity points = {zero_num_points}")
-                    # mode_intensity 출력 부분
+                    
                     mode_intensity_str = f"{mode_intensity:.2f}" if mode_intensity is not None else "N/A"
                     #print(f"Average intensity = {avg_intensity:.2f} ({std_intensity:.2f}), Median intensity = {med_intensity:.2f}, Mode intensity = {mode_intensity_str}, Distance: {distance:.2f} meters")
                     #print("\n")
-                    # 계산된 왜도와 첨도 출력
-                    #rint(f"Box {idx + 1} → Skewness = {box_skewness:.2f}, Kurtosis = {box_kurtosis:.2f}")
+                    
+                    #print(f"Box {idx + 1} → Skewness = {box_skewness:.2f}, Kurtosis = {box_kurtosis:.2f}")
 
 
 
@@ -327,27 +294,26 @@ def main():
 
         print(distances.keys())
 
-    # 클래스 별로 설정한 퍼센트 기준을 넘는 바운딩 박스 수를 집계
+    # Aggregate the number of bounding boxes that exceed the specified percentage threshold for each class
     percentage_thresholds = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     class_percentage_counters = {cls: {th: 0 for th in percentage_thresholds} for cls in cfg.CLASS_NAMES}
-    class_total_boxes = {cls: 0 for cls in cfg.CLASS_NAMES} # 각 클래스별 전체 바운딩 박스 수를 저장할 딕셔너리
+    class_total_boxes = {cls: 0 for cls in cfg.CLASS_NAMES} # Dictionary to store the total number of bounding boxes per class
 
 
 
     for class_name, percentages in class_percentage_data.items():
         for percentage in percentages:
-            class_total_boxes[class_name] += 1  # 각 클래스별로 바운딩 박스 수를 추가
+            class_total_boxes[class_name] += 1
             for threshold in percentage_thresholds:
                 if percentage > threshold:
                     class_percentage_counters[class_name][threshold] += 1
 
-    # 결과 출력
     for class_name, counters in class_percentage_counters.items():
-        total_boxes = class_total_boxes[class_name]  # 클래스별 전체 바운딩 박스 수
+        total_boxes = class_total_boxes[class_name]
         print(f"\nClass: {class_name}, Total Boxes: {total_boxes}")
         for threshold, count in counters.items():
-            if total_boxes > 0:  # 0으로 나누는 것을 방지
-                percentage = (count / total_boxes) * 100  # 비율 계산
+            if total_boxes > 0:
+                percentage = (count / total_boxes) * 100
                 print(f"Boxes with >{threshold}% points exceeding the threshold: {count} ({percentage:.2f}%)")
             else:
                 print(f"Boxes with >{threshold}% points exceeding the threshold: {count} (N/A - No boxes)")
