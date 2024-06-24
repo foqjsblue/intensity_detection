@@ -45,7 +45,7 @@ class AnchorHeadSingle(AnchorHeadTemplate):
         cls_preds = self.conv_cls(spatial_features_2d)
         box_preds = self.conv_box(spatial_features_2d)
 
-        cls_preds = cls_preds.permute(0, 2, 3, 1).contiguous()  # [N, H, W, C], 이미지 내에 존재할 수 있는 모든 객체들의 예측 클래스에 대한 정보
+        cls_preds = cls_preds.permute(0, 2, 3, 1).contiguous()  # [N, H, W, C], Information on the predicted classes for all objects that may exist within the image
         box_preds = box_preds.permute(0, 2, 3, 1).contiguous()  # [N, H, W, C]
 
         #print(f"cls_preds.shape:{cls_preds.shape}")
@@ -68,16 +68,16 @@ class AnchorHeadSingle(AnchorHeadTemplate):
             #print(f"data_dict :{list(data_dict.keys())}")
 
             #if 'gt_boxes' not in data_dict:
-                # 더미 gt_boxes 형태: [x, y, z, dx, dy, dz, heading, class_index]
-                #dummy_gt_boxes = torch.zeros((1, 1, 8), device='cuda')  # 배치 크기 1, 객체 수 1, 속성 8
-                # 클래스 인덱스를 의미있는 값으로 설정하거나, 모델에 따라 적절히 조정
-                #dummy_gt_boxes[:, :, 7] = -1  # 예시로, 클래스 인덱스를 -1로 설정
+                # Dummy gt_boxes format: [x, y, z, dx, dy, dz, heading, class_index]
+                #dummy_gt_boxes = torch.zeros((1, 1, 8), device='cuda')  # Batch size 1, number of objects 1, attributes 8
+                # Set the class index to meaningful values or adjust appropriately according to the model
+                #dummy_gt_boxes[:, :, 7] = -1  # For example, set the class index to -1
                 #data_dict['gt_boxes'] = dummy_gt_boxes
 
             targets_dict = self.assign_targets(
                 gt_boxes=data_dict['gt_boxes']
             )
-            #print("gt_boxes:", gt_boxes) ## 형식 출력
+            #print("gt_boxes:", gt_boxes)
             self.forward_ret_dict.update(targets_dict)
 
             ##
@@ -103,7 +103,7 @@ class AnchorHeadSingle(AnchorHeadTemplate):
             data_dict['batch_box_preds'] = batch_box_preds
             data_dict['cls_preds_normalized'] = False
 
-            # 새로 생성된 값들을 출력
+            # Print the newly created values
             #print("batch_cls_preds max value:", batch_cls_preds.max().item())
             #print("batch_cls_preds min value:", batch_cls_preds.min().item())
             #print("batch_box_preds max value:", batch_box_preds.max().item())
