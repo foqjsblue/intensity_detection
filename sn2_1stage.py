@@ -139,7 +139,7 @@ def main():
                     fake_box_count += 1
                     
                 frame_idx = min(idx, len(demo_dataset.sample_file_list) - 1)
-                frame_id = int(os.path.splitext(os.path.basename(demo_dataset.sample_file_list[frame_idx]))[0].split('_')[1])  # 파일명에서 frame_id 추출
+                frame_id = int(os.path.splitext(os.path.basename(demo_dataset.sample_file_list[frame_idx]))[0].split('_')[1])  # Extract the frame_id from the file name
 
                 box_info = {
                     'frame_id': frame_id,
@@ -149,11 +149,11 @@ def main():
                     'box_yaw': box_yaw,
                     'class_label': label_idx,
                     'label': 'fake' if is_fake else 'normal',
-                    'num_points_in_box': num_points,  # 추가된 정보
-                    'points': pts  # 추가된 정보
+                    'num_points_in_box': num_points,
+                    'points': pts
                 }
                 
-                # 디버깅용 출력
+                
                 #print(f"(Stage 1) Frame ID: {frame_id}, File Name: {demo_dataset.sample_file_list[frame_idx]}, Box Center: {box_center}")
 
                 stage1_results.append(box_info)
