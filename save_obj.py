@@ -160,11 +160,7 @@ def main():
     real_cyc_count = 0
 
     total_bounding_boxes = 0
-    fake_car_info = []  # 가짜 객체 정보를 저장하는 리스트
-    fake_ped_info = []
-    fake_cyc_info = []
 
-    # 바운딩 박스를 위한 전역 카운터
     global_box_counters = {'Car': 1, 'Pedestrian': 1, 'Cyclist': 1}
 
     with (((torch.no_grad()))):
@@ -185,7 +181,7 @@ def main():
             total_bounding_boxes += len(bounding_boxes)
 
             file_name = demo_dataset.sample_file_list[idx]
-            file_name = os.path.basename(file_name)  # 전체 경로에서 파일 이름만 추출
+            file_name = os.path.basename(file_name)
 
             points_in_boxes = [[] for _ in bounding_boxes]
             for p in data_dict['points']:
@@ -198,7 +194,6 @@ def main():
             for idx, points_in_box in enumerate(points_in_boxes):
                 label_idx = class_labels[idx] - 1
                 class_name = cfg.CLASS_NAMES[label_idx]
-                # 바운딩 박스의 중심까지의 거리 계산
                 box_center = bounding_boxes[idx][:3]
                 distance = math.sqrt(box_center[0] ** 2 + box_center[1] ** 2 + box_center[2] ** 2)
 
@@ -220,10 +215,7 @@ def main():
                 temppointlist3 = []
                 temppointlist_all = []
 
-                # 각 포인트들의 좌표(x, y, z)와 강도(i)를 포함하는 배열 생성
                 box_points = np.array([[p[0], p[1], p[2], p[3]] for p in pts if p[3] != 0.0])
-
-                # 각 포인트의 intensity만 추출하여 배열 생성
                 intensity = np.array([p[3] for p in pts])
 
                 num_points = len(box_points)
@@ -325,76 +317,11 @@ def main():
                     #print(f"Box {idx + 1} ==> Retro-reflector : {count_greater}, Diffuse reflector : {count_lesser_or_equal}, Ratio of retro-reflector : {percentage_greater:.2f}%")
                     #print("\n")
 
-                    # 공격 탐지
-                    if class_name == 'Car' and len(temppointlist) >= 10:
-
-                        if avg_intensity > 0.57454:
-                            fake_car_count += 1
-                            fake_car_info.append((file_name, idx + 1, round(avg_intensity, 2),
-                                                  str(len(temppointlist)) + 'points',
-                                                  str(round(distance, 2)) + 'm'))  # 파일 이름, 박스 번호, 클래스 이름 저장
-
-                        elif std_intensity == 0 and np.all(np.array(temppointlist_all) == 1.0):
-                            fake_car_count += 1
-                            fake_car_info.append((file_name, idx + 1, round(avg_intensity, 2),
-                                                  str(len(temppointlist)) + 'points', str(round(distance, 2)) + 'm'))
-
-                        else:
-                            # if class_name == 'Car' and avg_intensity <= 0.4 and percentage_greater <= 25.0:
-                            real_car_count += 1
-
-                    else:
-                        pass
-
-                    if class_name == 'Pedestrian' and len(temppointlist) >= 10:
-
-                        if avg_intensity > 0.6961:
-                            fake_ped_count += 1
-                            fake_ped_info.append((file_name, idx + 1, round(avg_intensity, 2),
-                                                  str(len(temppointlist)) + 'points', str(round(distance, 2)) + 'm'))
-
-                        elif std_intensity == 0 and np.all(np.array(temppointlist_all) == 1.0):
-                            fake_ped_count += 1
-                            fake_ped_info.append((file_name, idx + 1, round(avg_intensity, 2),
-                                                  str(len(temppointlist)) + 'points', str(round(distance, 2)) + 'm'))
-
-                        else:
-                            # if class_name == 'Car' and avg_intensity <= 0.4 and percentage_greater <= 25.0:
-                            real_ped_count += 1
-
-                    else:
-                        pass
-
-                    if class_name == 'Cyclist' and len(temppointlist) >= 10:
-
-                        if avg_intensity > 0.6961:
-                            fake_cyc_count += 1
-                            fake_cyc_info.append((file_name, idx + 1, round(avg_intensity, 2),
-                                                  str(len(temppointlist)) + 'points', str(round(distance, 2)) + 'm'))
-
-                        elif std_intensity == 0 and np.all(np.array(temppointlist_all) == 1.0):
-                            fake_cyc_count += 1
-
-                        else:
-                            # if class_name == 'Car' and avg_intensity <= 0.4 and percentage_greater <= 25.0:
-                            real_cyc_count += 1
-
-                    else:
-                        pass
-
-                pass
-
         print(distances.keys())
 
 
     # 결과 출력
     print(f"Total number of bounding boxes: {total_bounding_boxes}")
-    print(f"Number of fake cars: {fake_car_count} / {fake_car_count + real_car_count}")
-    print("Fake objects detected in files, box numbers:", fake_car_info)
-    print(f"Number of fake pedestrians: {fake_ped_count} / {fake_ped_count + real_ped_count}")
-    print("Fake pedestrians detected in files, box numbers:", fake_ped_info)
-    print(f"Number of fake cyclists: {fake_cyc_count} / {fake_cyc_count + real_cyc_count}")
-    print("Fake cyclists detected in files, box numbers:", fake_cyc_info)
     #print(f"▶ Number of bounding boxes saved: {global_box_counter - 1}")
     for class_name, counter in global_box_counters.items():
         print(f"▶ Number of {class_name} bounding boxes saved: {counter - 1}")
