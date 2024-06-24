@@ -104,11 +104,11 @@ def is_point_inside_box(point, box):
 
 
 def find_nearest_neighbors(points, k=10):
-    # 포인트 세트의 크기가 k보다 작은 경우 빈 리스트 반환
+    # If the size of the point set is less than k, return an empty list
     if len(points) < k:
         return []
 
-    # 리스트를 NumPy 배열로 변환
+    # Convert the list to a NumPy array
     points_array = np.array(points)
 
     nbrs = NearestNeighbors(n_neighbors=k, algorithm='kd_tree').fit(points_array[:, :3])
@@ -122,7 +122,7 @@ def count_similar_intensity_points(points, neighbors_indices, intensity_threshol
     for i_knn, point in enumerate(points):
         if i_knn < len(neighbors_indices):
             neighbor_idxs = neighbors_indices[i_knn]
-            # 각 이웃의 인덱스를 사용하여 이웃 포인트들을 선택
+            # Select neighbor points using the indices of each neighbor
             neighbors = [points[idx] for idx in neighbor_idxs]
 
             if all(abs(point[3] - neighbor[3]) <= intensity_threshold for neighbor in neighbors):
@@ -137,14 +137,13 @@ logger = logging.getLogger(__name__)
 
 def save_points_to_bin(points, output_dir, file_name):
     try:
-        # 파일 경로 생성
         file_path = os.path.join(output_dir, file_name)
 
-        # 포인트들을 NumPy 배열로 변환하고 파일로 저장
+        # Convert the points to a NumPy array and save to a file
         np.array(points, dtype=np.float32).tofile(file_path)
-        logger.info(f"파일 성공적으로 저장됨: {file_path}")
+        logger.info(f"File saved successfully: {file_path}")
     except Exception as e:
-        logger.error(f"파일 저장 중 오류 발생: {e}")
+        logger.error(f"Error occurred while saving the file: {e}")
 
 
 def load_point_cloud_from_bin(bin_path):
@@ -154,18 +153,18 @@ def merge_point_clouds(background_pc, additional_pc):
     return np.concatenate([background_pc, additional_pc], axis=0)
 
 def adjust_intensity_values(point_cloud, min_intensity=0.18, max_intensity=1.0):
-    # 포인트 클라우드의 강도 값만 조정
+    # Adjust only the intensity values of the point cloud
     adjusted_pc = np.copy(point_cloud)
     random_intensities = np.random.uniform(min_intensity, max_intensity, size=(adjusted_pc.shape[0],))
     adjusted_pc[:, 3] = random_intensities
     return adjusted_pc
 
 def filter_points(points): # strongest mode
-    # 각 포인트의 각도와 intensity 계산
+    # Calculate the angle and intensity for each point
     def calculate_angle_and_intensity(x, y, z):
         r = np.sqrt(x**2 + y**2 + z**2)
-        theta = np.arctan2(y, x) # 수평각도
-        phi = np.arcsin(z / r) # 수직각도
+        theta = np.arctan2(y, x) # Horizontal angle
+        phi = np.arcsin(z / r) # Vertical angle
         return theta, phi
 
     unique_points = {}
@@ -173,12 +172,12 @@ def filter_points(points): # strongest mode
         x, y, z, intensity = point
         theta, phi = calculate_angle_and_intensity(x, y, z)
 
-        # 각도를 키로 사용
-        angle_key = (round(theta, 5), round(phi, 5))  # 반올림을 통해 유사한 각도 그룹화
+        # Use the angle as a key
+        angle_key = (round(theta, 5), round(phi, 5))  # Group similar angles through rounding
         if angle_key not in unique_points or unique_points[angle_key][3] < intensity:
             unique_points[angle_key] = point
 
-    # 필터링된 포인트 클라우드 반환
+    # Return the filtered point cloud
     return np.array(list(unique_points.values()))
 
 
@@ -193,15 +192,15 @@ def main():
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
 
-    # 기본 포인트 클라우드 데이터 로드
+    # Load the basic point cloud data
     base_point_cloud_path = args.data_path
 
     if args.box_path:
-        # 폴더 내의 모든 bin 파일 목록을 가져옴
+        # Retrieve a list of all bin files in the folder
         box_files = glob.glob(os.path.join(args.box_path, '*.bin'))
-        # 각 박스 파일에 대해 반복 처리
+        # Iterate over each box file
         for idx, box_file in enumerate(box_files):
-            # 기본 포인트 클라우드 로드 (매번 새로 로드하여 기존 데이터에 영향을 주지 않음)
+            # Load the basic point cloud (reload each time to prevent affecting existing data)
             base_point_cloud = load_point_cloud_from_bin(base_point_cloud_path)
             box_point_cloud = load_point_cloud_from_bin(box_file)
 
@@ -219,7 +218,7 @@ def main():
             output_filepath = os.path.join(output_directory, output_filename)
             save_points_to_bin(filtered_points, output_directory, output_filename)
 
-            # 필요에 따라 저장된 파일의 경로를 출력하거나 로깅
+            # Print or log the path of the saved file as needed
             logger.info(f'Merged file saved to {output_filepath}')
 
 
@@ -236,7 +235,7 @@ def main():
     temppointlist = []
     total_bounding_boxes = 0
 
-    # 바운딩 박스를 위한 전역 카운터
+    # Global counter for bounding boxes
     global_box_counters = {'Car': 1, 'Pedestrian': 1, 'Cyclist': 1}
 
     with (((torch.no_grad()))):
@@ -256,7 +255,7 @@ def main():
             total_bounding_boxes += len(bounding_boxes)
 
             file_name = demo_dataset.sample_file_list[idx]
-            file_name = os.path.basename(file_name)  # 전체 경로에서 파일 이름만 추출
+            file_name = os.path.basename(file_name)  # Extract only the file name from the full path
 
             points_in_boxes = [[] for _ in bounding_boxes]
             for p in data_dict['points']:
@@ -270,15 +269,15 @@ def main():
 
             for idx, pts in enumerate(points_in_boxes):
 
-                # 바운딩 박스 처리 시작 전에 temppointlist 배열 초기화
+                # Initialize the temppointlist array before starting bounding box processing
                 temppointlist = []
                 temppointlist3 = []
                 temppointlist_all = []
 
-                # 각 포인트들의 좌표(x, y, z)와 강도(i)를 포함하는 배열 생성
+                # Create an array containing the coordinates (x, y, z) and intensity (i) of each point
                 box_points = np.array([[p[0], p[1], p[2], p[3]] for p in pts if p[3] != 0.0])
 
-                # 각 포인트의 intensity만 추출하여 배열 생성
+                # Create an array by extracting only the intensity of each point
                 intensity = np.array([p[3] for p in pts])
 
                 num_points = len(box_points)
@@ -310,7 +309,7 @@ def main():
                     top_percentage = 0.0
                     bottom_percentage = 0.0
 
-                    # 상위 및 하위 퍼센트에 해당하는 요소의 수를 계산
+                    # Calculate the number of elements corresponding to the top and bottom percentiles(Optional)
                     num_elements = len(temppointlist2)
                     num_to_remove_top = int(num_elements * top_percentage)
                     num_to_remove_bottom = int(num_elements * bottom_percentage)
@@ -339,8 +338,6 @@ def main():
 
         print(distances.keys())
 
-
-    # 결과 출력
     print(f"Total number of bounding boxes: {total_bounding_boxes}")
     logger.info('Attack Detection Complete.')
     return box_data
