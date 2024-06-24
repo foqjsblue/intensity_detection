@@ -69,7 +69,7 @@ def statistics_info(cfg, ret_dict, metric, disp_dict):
         '(%d, %d) / %d' % (
         metric['recall_roi_%s' % str(min_thresh)], metric['recall_rcnn_%s' % str(min_thresh)], metric['gt_num'])
 
-def clip_eta(grad, eps, norm=np.inf): #입력된 그래디언트에 대해 주어진 norm 제약 조건 하에서 최적의 perturbation을 계산
+def clip_eta(grad, eps, norm=np.inf): # Calculate the optimal perturbation under the given norm constraint for the input gradient
     """
     Solves for the optimal input to a linear function under a norm constraint.
     Optimal_perturbation = argmax_{eta, ||eta||_{norm} < eps} dot(eta, grad)
@@ -82,7 +82,7 @@ def clip_eta(grad, eps, norm=np.inf): #입력된 그래디언트에 대해 주�
     grad_shape_len = len(grad.shape)
     if grad_shape_len == 3:
         #grad = grad.view(-1, 3)
-        grad = grad.view(-1, 4)  # x, y, z 뿐만 아니라 intensity도 포함
+        grad = grad.view(-1, 4)  # Include not only x, y, z but also intensity
 
     red_ind = list(range(1, len(grad.size())))
     avoid_zero_div = torch.tensor(1e-36, dtype=grad.dtype, device=grad.device)
@@ -125,7 +125,7 @@ def clip_eta(grad, eps, norm=np.inf): #입력된 그래디언트에 대해 주�
 
     # Scale perturbation to be the solution for the norm=eps rather than
     # norm=1 problem
-    scaled_perturbation = eps * optimal_perturbation # eps가 epsilon 역할
+    scaled_perturbation = eps * optimal_perturbation
     if grad_shape_len == 3:
         scaled_perturbation = scaled_perturbation.view(grad_shape)
     return scaled_perturbation
@@ -231,11 +231,11 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
             key_origin = batch_dict[key][:, 1:4].clone()
         key_origin.requires_grad = False  # important
 
-        if rand_init: # 왜곡(perturbation)을 처음 시작할 때 무작위로 초기화 (PGD)
+        if rand_init: # Initialize the perturbation randomly at the start (PGD)
             # perturbation = torch.zeros_like(points_origin[:, 1:5]).uniform_(-eps, eps).cuda(points_origin.device)
             if key == 'voxels':
                 #perturbation = torch.zeros_like(key_origin[:, :3]).uniform_(-eps, eps).cuda(key_origin.device)
-                perturbation = torch.zeros_like(key_origin[:, :4]).uniform_(-eps, eps).cuda(key_origin.device) # intensity 포함
+                perturbation = torch.zeros_like(key_origin[:, :4]).uniform_(-eps, eps).cuda(key_origin.device) # Include intensity
             else:
                 perturbation = torch.zeros_like(key_origin).uniform_(-eps, eps).cuda(key_origin.device)
             perturbation = clip_eta(perturbation, eps, norm)
@@ -243,7 +243,7 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
             if key == 'voxels':
                 points_valid = copy.deepcopy(points_origin)
                 #points_valid[:, :3] = points_valid[:, :3] + perturbation.cpu().numpy()
-                points_valid[:, :4] = points_valid[:, :4] + perturbation.cpu().numpy() # intensity 포함
+                points_valid[:, :4] = points_valid[:, :4] + perturbation.cpu().numpy() # Include intensity
 
                 # re-voxelize
                 # points_flatten = batch_dict[key].view(-1, num_point_features)
@@ -297,62 +297,62 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
                                                                              batch_dict['voxels'].shape[1], 1)], axis=2)
                 voxels = voxels.cpu().numpy()
 
-        # rand_init 끝
+        # End of rand_init
 
-        model.train()###################################################################################################훈련모드
+        model.train()###################################################################################################Training mode
         for m in model.modules():
             if isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
-                m.eval() #배치 정규화 층을 평가 모드로 설정
+                m.eval() # Set batch normalization layers to evaluation mode
 
         # print("### batch_dict voxels shape", batch_dict[key].shape)
         batch_dict[key].requires_grad = True
 
         if key == 'voxels':
             #g = torch.zeros_like(batch_dict[key][:, :, :3]).to(key_origin.device)
-            g = torch.zeros_like(batch_dict[key][:, :, :4]).to(key_origin.device) # intensity 포함
+            g = torch.zeros_like(batch_dict[key][:, :, :4]).to(key_origin.device) # Include intensity
         else:
-            g = torch.zeros_like(key_origin).to(key_origin.device) # intensity 미포함
+            g = torch.zeros_like(key_origin).to(key_origin.device) # Exclude intensity
 
         for i in range(nb_iter):
             # print("### iteration", i)
-            for cur_module in model.module_list: ##모듈을 순서대로 실행시킴 -> 예측 관련 키 생성
+            for cur_module in model.module_list: ##Execute modules sequentially -> generate prediction-related keys
                 #print("## iterate", cur_module)
                 batch_dict = cur_module(batch_dict)
                 #print(f"batch_dict:{batch_dict.keys()}")
 
-            # 'gt_boxes'에서 마지막 차원의 레이블 정보 추출 (PyTorch 방식으로)
+            # Extract the label information from the last dimension of 'gt_boxes' (in PyTorch style)
 
             #print(batch_dict['gt_boxes'][:, -1])
             original_labels = batch_dict['gt_boxes'][:, -1].long().clone() ##
 
-            ###수정
-
+            ###
+            
             target_class_name = "Car"
             if target_class_name not in cfg.CLASS_NAMES:
                 raise ValueError(f"Target class '{target_class_name}' not found in CLASS_NAMES.")
             target_class_index = cfg.CLASS_NAMES.index(target_class_name)
 
-            # 실제 레이블을 "car"로 변경
+            # Change the actual label to "car"
             #if 'batch_cls_preds' in batch_dict:
                 #batch_dict['batch_cls_preds'] = torch.full_like(batch_dict['batch_cls_preds'], target_class_index)
-            target_probs = batch_dict['batch_cls_preds'][:, target_class_index]  # "Car" 클래스에 대한 예측 확률 추출
+            target_probs = batch_dict['batch_cls_preds'][:, target_class_index]  # Extract the prediction probability for the "Car" class
 
-            ### perturbation의 목적 설정
+            ### Set the objective of the perturbation
 
             # loss, tb_dict = model.dense_head.get_loss()
             #loss, tb_dict, _ = model.get_training_loss()
-            # 목표: "Car" 클래스에 대한 예측 확률을 최대화
+            # Objective: Maximize the prediction probability for the "Car" class
 
-            #criterion = nn.CrossEntropyLoss(reduction='mean')  # 다중 분류
+            #criterion = nn.CrossEntropyLoss(reduction='mean')  # Multiclass classification
             focal_loss = SigmoidFocalClassificationLoss(gamma=2.0, alpha=0.25)
 
             logits = batch_dict['batch_cls_preds'].squeeze(-1)
-            num_classes = logits.size(-1)  # logits에서 클래스 수 추출
+            num_classes = logits.size(-1)  # Extract the number of classes from the logits
             target_labels = torch.full((logits.size(0),), target_class_index, dtype=torch.long).cuda()
             targets_one_hot = torch.eye(num_classes)[target_labels].cuda()
 
 
-            # logits의 형태가 (B, #anchors, #classes)이고, 모든 예제와 앵커에 동일한 가중치를 적용
+            # The shape of the logits is (B, #anchors, #classes), and apply the same weight to all examples and anchors
             weights = torch.ones((logits.size(0), logits.size(1))).cuda()
 
             #loss = criterion(logits, target_labels)
@@ -369,16 +369,16 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
             model.zero_grad()
             batch_dict[key].retain_grad()
             #loss.backward(retain_graph=True)
-            # loss 값을 스칼라로 변환
-            loss_scalar = loss.mean()  # 또는 loss.sum(), 상황에 따라 선택
+            # Convert the loss value to a scalar
+            loss_scalar = loss.mean()  # Or use loss.sum(), depending on the situation
             loss_scalar.backward(retain_graph=True)
 
             grad = batch_dict[key].grad.data
 
             if key == 'voxels':
                 grad[batch_dict[key] == 0] = 0
-                #grad = grad[:, :, :3] # intensity는 보지 않고 있음
-                grad = grad[:, :, :4] # intensity 포함
+                #grad = grad[:, :, :3] # Intensity is not being considered
+                grad = grad[:, :, :4] # Include intensity
             else:
                 #grad = grad[:, 1:4]
                 grad = grad[:, 1:5]
@@ -391,12 +391,12 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
             if 'second' in args.cfg_file or 'voxel_rcnn' in args.cfg_file or 'PartA2' in args.cfg_file:
                 grad = - grad
 
-            #perturbation 추가
+            # Add perturbation
 
-            if args.attack == 'MI': # 모멘텀 업데이트된 그래디언트 사용, 과거의 이동을 참고
+            if args.attack == 'MI': # Use momentum-updated gradient, referring to past movements
                 g = decay_factor * g + grad / torch.norm(grad, p=1)
                 perturbation = clip_eta(g, iter_eps, norm)
-            else: # 단일 그래디언트 업데이트(FGSM) 또는 여러 단계에 걸친 그래디언트 업데이트(PGD)를 사용
+            else: # Use a single gradient update (FGSM) or multiple gradient updates (PGD)
                 perturbation = clip_eta(grad, iter_eps, norm)
                 # perturbation = torch.clamp(grad, -eps, eps)
 
@@ -409,22 +409,22 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
                 # perturbation = clip_eta(perturbation, eps, norm)
                 # batch_dict[key][:, :, :3] = key_origin + perturbation
                 
-                #batch_dict[key][:, :, :3] = batch_dict[key][:, :, :3] + perturbation # perturbation 추가
+                #batch_dict[key][:, :, :3] = batch_dict[key][:, :, :3] + perturbation # Add perturbation
                 #print("(1) First 5 points data (x, y, z, intensity):")
                 #print(batch_dict[key][:, :5, :4])
 
-                batch_dict[key][:, :, :4] = batch_dict[key][:, :, :4] + perturbation # intensity 포함
+                batch_dict[key][:, :, :4] = batch_dict[key][:, :, :4] + perturbation # Include intensity
 
                 #print("(2) First 5 points data (x, y, z, intensity):")
                 #print(batch_dict[key][:, :5, :4])
 
-                #batch_dict[key][:, :, 3] = torch.clamp(batch_dict[key][:, :, 3], min=0, max=1) # intensity 범위 조정
+                #batch_dict[key][:, :, 3] = torch.clamp(batch_dict[key][:, :, 3], min=0, max=1) # Adjust the intensity range
 
-                if args.attack != 'MI' or (args.attack == 'MI' and i == nb_iter - 1): # FGSM, PGD or MI 마지막 반복
+                if args.attack != 'MI' or (args.attack == 'MI' and i == nb_iter - 1): # Final iteration of FGSM, PGD, or MI
                     voxels_with_pointindex = torch.cat(
                         [batch_dict[key], torch.from_numpy(voxels[:, :, -1:]).float().cuda(key_origin.device)], axis=2)
                     points_flatten = voxels_with_pointindex.view(-1, num_point_features + 1)
-                    #voxels_with_pointindex를 평탄화하여 모든 점을 일렬로 늘어놓고, 점들의 절대값 합이 0이 아닌 유효한 포인트만 points_valid로 추출
+                    # Flatten `voxels_with_pointindex` to lay out all points in a row, and extract only valid points with a non-zero sum of absolute values into `points_valid`
 
                     points_sum = (points_flatten.abs()).sum(1)
                     points_valid = points_flatten[points_sum != 0].cpu().numpy()
@@ -434,17 +434,18 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
                     # import pdb;pdb.set_trace()
 
                     #perturbation = points_valid[:, :3] - points_origin[points_valid[:, -1].astype(int), :3]
-                    perturbation = points_valid[:, :4] - points_origin[points_valid[:, -1].astype(int), :4] # intensity 포함
+                    perturbation = points_valid[:, :4] - points_origin[points_valid[:, -1].astype(int), :4] # Include intensity
 
-                    # 원본 포인트 클라우드(points_origin)를 빼서 실제 적용된 왜곡 값을 계산
-                    # points_valid[:, :3]는 왜곡된 포인트, points_origin[points_valid[:, -1].astype(int), :3]는 각 왜곡된 포인트에 대응하는 원본 포인트의 좌표
+                    # Subtract the original point cloud (`points_origin`) to calculate the actual applied perturbation values
+                    # `points_valid[:, :3]` are the perturbed points, and `points_origin[points_valid[:, -1].astype(int), :3]` are the coordinates of the original points corresponding to each perturbed point
 
-                    ##################################################### second clip_eta #왜곡을 eps와 norm에 맞게 다시 조정
+                    ##################################################### second clip_eta # Adjust the perturbation again to fit eps and norm
+                    
                     perturbation = clip_eta(torch.from_numpy(perturbation), eps, norm).numpy()
                     # perturbation = np.clip(perturbation, -eps, eps)
                     # print('### perturbation', perturbation)
                     #points_valid[:, :3] = points_origin[points_valid[:, -1].astype(int), :3] + perturbation
-                    points_valid[:, :3] = points_origin[points_valid[:, -1].astype(int), :3] + perturbation[:, :3] # intensity 잠시 제외
+                    points_valid[:, :3] = points_origin[points_valid[:, -1].astype(int), :3] + perturbation[:, :3] # Temporarily exclude intensity
 
                     # limit the points in the point cloud range
                     points_valid[points_valid[:, 0] >= point_cloud_range[3], 0] = point_cloud_range[3] - 1e-6
@@ -463,14 +464,14 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
                     pad_batch_indexs = np.zeros((len(voxels), 1))
                     coordinates = np.concatenate([pad_batch_indexs, coordinates], axis=1)
                     batch_dict['voxel_coords'] = torch.from_numpy(coordinates).float().cuda(key_origin.device)
-                    batch_dict['voxel_num_points'] = torch.from_numpy(num_points).float().cuda(key_origin.device) # 새롭게 생성된 복셀 정보 업데이트
+                    batch_dict['voxel_num_points'] = torch.from_numpy(num_points).float().cuda(key_origin.device) # Update the newly generated voxel information
 
                     # print("### after perturbation and re-voxelization, valid points num = ", (points_sum!=0).sum())
-            else: ## voxel 아닐 때
+            else: ## When not a voxel
                 #perturbation = batch_dict[key][:, 1:4] + perturbation - key_origin
-                perturbation = batch_dict[key][:, 1:5] + perturbation - key_origin # intensity 포함
+                perturbation = batch_dict[key][:, 1:5] + perturbation - key_origin # Include intensity
 
-                # intensity 값 클리핑 (0에서 1 사이)
+                # Clip the intensity values (between 0 and 1)
                 batch_dict[key][:, 4] = torch.clamp(batch_dict[key][:, 4], min=0, max=1)
                 
                 # perturbation = torch.clamp(perturbation, -eps, eps)
@@ -538,7 +539,7 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
                 save_points.tofile(f)
                 # how to load: obj_points = np.fromfile(str(output_path), dtype=np.float32).reshape(-1 ,4)
 
-        #################################################################################################################평가모드
+        ################################################################################################################# Evaluation mode
         model.eval()
         with torch.no_grad():
             pred_dicts, ret_dict = model(batch_dict)
@@ -546,14 +547,14 @@ def eval_one_epoch(cfg, model, dataloader, epoch_id, logger, args, dist_test=Fal
 
         """
 
-        # 결과 분석 및 클래스 "Car"로 변경된 바운딩 박스 수 계산
+        # Analyze the results and calculate the number of bounding boxes changed to class "Car"
         num_modified = 0
         for j, pred_dict in enumerate(pred_dicts):
             car_index = dataset.class_names.index("Car")
             original_non_cars = original_labels[j] != car_index
             predicted_as_car = pred_dict['pred_labels'] == car_index
 
-            # 배열 크기 확인
+            # Check the array size
             print(f'Original non-car labels size: {original_non_cars}')
             print(f'Predicted as car labels size: {predicted_as_car}')
 
