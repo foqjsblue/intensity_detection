@@ -9,8 +9,7 @@ All these files must be located in OpenPCDet/tools after installing OpenPCDet vi
 Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d)
 
 
-
-- **Scenario Description**
+**Scenario Description**
 
 - *Normal Scenario* : A situation where no attacks are performed (You can input the bin file as it is)
 
@@ -18,9 +17,9 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 - *Attack Scenario 2* : A situation where there are multiple normal objects and one fake object is injected
 
-- **Explanation of Attack Code**
+**Explanation of Attack Code**
 
-- **(1) Normal Scenario, Attack Scenario 1**
+**(1) Normal Scenario, Attack Scenario 1**
 
 - *save_box_fake.py* : Stage 1 (Threshold-based Classification)
 
@@ -28,11 +27,11 @@ Configure save_box_fake.py to receive the folder containing boxes classified as 
 
 - *pytorch_kitti/main.py* : Stage2 (DGCNN-based Classification)
 
-- **(2) Attack Scenario 2**
+**(2) Attack Scenario 2**
 
 - *sn2_final.py* : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the detection performance → Attack Scenario 2
 
-- **Code to create fake objects**
+**Code to create fake objects**
 
 - *save_obj.py* : Cut and save the points within the bounding boxes that are within a specific distance(20m).
 
