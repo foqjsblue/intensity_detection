@@ -20,11 +20,17 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 **Explanation of Attack Code**
 
-*save_box_fake.py* : Stage 1 (Threshold-based Classification) → Normal Scenario, Attack Scenario 1
+**(1) Normal Scenario, Attack Scenario 1**
 
-*pytorch_kitti/main.py* : Stage2 (DGCNN-based Classification) → Normal Scenario, Attack Scenario 1
+*save_box_fake.py* : Stage 1 (Threshold-based Classification)
+
+- Configure save_box_fake.py to receive the folder containing boxes classified as attack in stage2 as input.
+
+*pytorch_kitti/main.py* : Stage2 (DGCNN-based Classification)
 
 *rotate.py* : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
+
+**(2) Attack Scenario 2**
 
 *sn2_final.py* : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the detection performance → Attack Scenario 2
 
