@@ -27,6 +27,8 @@ Configure save_box_fake.py to receive the folder containing boxes classified as 
 
 - *pytorch_kitti/main.py* : Stage2 (DGCNN-based Classification)
 
+For detailed instructions, refer to the README.md file within the pytorch_kitti folder.
+
 **(2) Attack Scenario 2**
 
 - *sn2_final.py* : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the detection performance → Attack Scenario 2
