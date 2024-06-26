@@ -37,6 +37,8 @@ For detailed instructions, refer to the README.md file within the pytorch_kitti 
 
 **(1) Attack Scenario 1**
 
+- *scenario1_normal.py* : When a normal bin file is input, keep only one normal object and save it.
+
 - *save_obj.py* : Cut and save the points within the bounding boxes that are within a specific distance(20m).
 
 - *modify_intensity.py* : Unify the intensity of the saved objects to a single value or randomly change it within a specific range.
