@@ -49,7 +49,7 @@ Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 
 - *rotate.py* : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
 
-- *inject_test* : Apply Strongest mode to an empty road (retaining only the point with the highest intensity among points at the same horizontal/vertical angle) and then synthesize fake objects.
+- *inject_test.py* : Apply Strongest mode to an empty road (retaining only the point with the highest intensity among points at the same horizontal/vertical angle) and then synthesize fake objects.
 
 - *save_fake.py* : Save only the injected objects detected by the object detection algorithm using inject_test.py.
 
