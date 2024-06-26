@@ -23,11 +23,11 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 - *save_box_fake.py* : Stage 1 (Threshold-based Classification)
 
-Configure save_box_fake.py to receive the folder containing boxes classified as attack in stage2 as input.
+  Configure save_box_fake.py to receive the folder containing boxes classified as attack in stage2 as input.
 
 - *pytorch_kitti/main.py* : Stage2 (DGCNN-based Classification)
 
-For detailed instructions, refer to the README.md file within the pytorch_kitti folder.
+  For detailed instructions, refer to the README.md file within the pytorch_kitti folder.
 
 **(2) Attack Scenario 2**
 
@@ -44,14 +44,14 @@ For detailed instructions, refer to the README.md file within the pytorch_kitti 
 - *modify_intensity.py* : Unify the intensity of the saved objects to a single value or randomly change it within a specific range.
 
 - *opt_attack.py*: An optimized attack on a pillar-based object detection algorithm.
-Modify OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py and then execute.
-Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
+  Modify OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py and then execute.
+  Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 
 - *rotate.py* : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
 
 - *inject_test.py* : Apply Strongest mode to an empty road (retaining only the point with the highest intensity among points at the same horizontal/vertical angle) and then synthesize fake objects.
 
-Specify the bounding box file path in the box_path option and the background file path in the data_path option.
+  Specify the bounding box file path in the box_path option and the background file path in the data_path option.
 
 - *save_fake.py* : Save only the injected objects detected by the object detection algorithm using inject_test.py.
 
@@ -59,7 +59,7 @@ Specify the bounding box file path in the box_path option and the background fil
 
 - *scenario2_inject.py* : Synthesize a fake object into a normal bin file containing multiple objects by applying Strongest mode.
 
-Specify the bounding box file path in the box_path option and the background file path in the data_path option.
+  Specify the bounding box file path in the box_path option and the background file path in the data_path option.
 
 - *scenario2_check.py* : Save only the injected fake objects that are detected by the object detection algorithm.
 
