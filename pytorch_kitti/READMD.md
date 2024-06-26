@@ -2,6 +2,8 @@
 
 This code is inspired by and builds upon the methods described in the [WangYueFt/dgcnn repository](https://github.com/WangYueFt/dgcnn).
 
+If you want to use a pre-trained model, unzip the file in the checkpoints folder and specify the path in the model_path option.
+
 **Training Mode**
 
 Modify main.py to set the folder containing real objects and fake objects as the input path.
