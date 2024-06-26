@@ -51,8 +51,16 @@ Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 
 - *inject_test.py* : Apply Strongest mode to an empty road (retaining only the point with the highest intensity among points at the same horizontal/vertical angle) and then synthesize fake objects.
 
+Specify the bounding box file path in the box_path option and the background file path in the data_path option.
+
 - *save_fake.py* : Save only the injected objects detected by the object detection algorithm using inject_test.py.
 
 **(2) Attack Scenario 2**
 
-*scenario2_inject.py*
+- *scenario2_inject.py* : Synthesize a fake object into a normal bin file containing multiple objects by applying Strongest mode.
+
+Specify the bounding box file path in the box_path option and the background file path in the data_path option.
+
+- *scenario2_check.py* : Save only the injected fake objects that are detected by the object detection algorithm.
+
+- *scenario2_fp_tp.py* : Measure TP and FP in Scenario 2 (folders needed for before attack, after attack, and after detection).
