@@ -43,7 +43,7 @@ For detailed instructions, refer to the README.md file within the pytorch_kitti 
 
 - *modify_intensity.py* : Unify the intensity of the saved objects to a single value or randomly change it within a specific range.
 
-- *attack_class.py*: An optimized attack on a pillar-based object detection algorithm.
+- *opt_attack.py*: An optimized attack on a pillar-based object detection algorithm.
 Modify OpenPCDet/pcdet/models/dense_heads/anchor_head_single.py and then execute.
 Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 
