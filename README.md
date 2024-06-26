@@ -54,3 +54,5 @@ Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 - *save_fake.py* : Save only the injected objects detected by the object detection algorithm using inject_test.py.
 
 **(2) Attack Scenario 2**
+
+*scenario2_inject.py*
