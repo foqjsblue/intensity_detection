@@ -9,7 +9,7 @@ All these files must be located in OpenPCDet/tools after installing OpenPCDet vi
 Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d)
 
 
-**Scenario Description**
+## Scenario Description
 
 - *Normal Scenario* : A situation where no attacks are performed (You can input the bin file as it is)
 
@@ -17,7 +17,7 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 - *Attack Scenario 2* : A situation where there are multiple normal objects and one fake object is injected
 
-**Explanation of Attack Code**
+## Explanation of Attack Code
 
 **(1) Normal Scenario, Attack Scenario 1**
 
@@ -33,7 +33,9 @@ For detailed instructions, refer to the README.md file within the pytorch_kitti 
 
 - *sn2_final.py* : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the detection performance → Attack Scenario 2
 
-**Code to create fake objects**
+## Code to create fake objects
+
+**(1) Attack Scenario 1**
 
 - *save_obj.py* : Cut and save the points within the bounding boxes that are within a specific distance(20m).
 
@@ -45,3 +47,8 @@ Based on [Robust3DOD](https://github.com/Eaphan/Robust3DOD)
 
 - *rotate.py* : By using object files (bin) as input, augmented data with random yaw direction rotation can be obtained.
 
+- *inject_test* : Apply Strongest mode to an empty road (retaining only the point with the highest intensity among points at the same horizontal/vertical angle) and then synthesize fake objects.
+
+- *save_fake.py* : Save only the injected objects detected by the object detection algorithm using inject_test.py.
+
+**(2) Attack Scenario 2**
