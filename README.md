@@ -21,6 +21,8 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 **(1) Normal Scenario, Attack Scenario 1**
 
+- *reflector.py* : Output the distribution of retroreflector intensity within the bounding boxes of the normal dataset compared to the entire bounding box.
+
 - *save_box_fake.py* : Stage 1 (Threshold-based Classification)
 
   Configure save_box_fake.py to receive the folder containing boxes classified as attack in stage2 as input.
