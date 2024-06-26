@@ -8,7 +8,7 @@ Modify main.py to set the folder containing real objects and fake objects as the
 Ensure to correctly label them as 'Normal Object' and 'Fake Object' according to the number and order of the input folders.
 
 ```bash
-python main.py --exp_name=dgcnn_0510_sgd_eval --model=dgcnn --k=4 --num_points=256 --epochs=300
+python main.py --exp_name=dgcnn_256_sgd_eval --model=dgcnn --k=4 --num_points=256 --epochs=300
 ```
 
 **Testing Mode**
@@ -17,5 +17,5 @@ In Testing mode, modify main.py to set the folder containing real objects and fa
 Ensure to correctly label them as 'Normal Object' and 'Fake Object' according to the number and order of the input folders.
 
 ```bash
-python main.py --exp_name=dgcnn_0510_sgd_eval --model=dgcnn --k=4 --num_points=256 --epochs=300 --eval=Ture --model_path=checkpoints/dgcnn_0510_sgd/models/model.t7
+python main.py --exp_name=dgcnn_256_sgd_eval --model=dgcnn --k=4 --num_points=256 --epochs=300 --eval=Ture --model_path=checkpoints/dgcnn_0510_sgd/models/model.t7
 ```
