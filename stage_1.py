@@ -252,11 +252,11 @@ def main():
     total_percentage = ((fake_car_count + fake_ped_count + fake_cyc_count) / (fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count)) * 100 if (fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count) > 0 else 0
 
     print(f"Total number of bounding boxes: {total_bounding_boxes}")
-    print(f"Number of fake cars: {fake_car_count} / {fake_car_count + real_car_count}({car_percentage:.2f}%)")
-    print(f"Number of fake pedestrians: {fake_ped_count} / {fake_ped_count + real_ped_count}({ped_percentage:.2f}%)")
-    print(f"Number of fake cyclists: {fake_cyc_count} / {fake_cyc_count + real_cyc_count}({cyc_percentage:.2f}%)")
-    print(f"Total number of fake objects: {fake_car_count + fake_ped_count + fake_cyc_count} / {fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count}({total_percentage:.2f}%)")
-    print(f"Total number of normal objects: {(fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count)-(fake_car_count + fake_ped_count + fake_cyc_count)} / {fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count}({total_percentage:.2f}%)")
+    print(f"Number of normal cars: {fake_car_count} / {fake_car_count + real_car_count}({car_percentage:.2f}%)")
+    print(f"Number of normal pedestrians: {fake_ped_count} / {fake_ped_count + real_ped_count}({ped_percentage:.2f}%)")
+    print(f"Number of normal cyclists: {fake_cyc_count} / {fake_cyc_count + real_cyc_count}({cyc_percentage:.2f}%)")
+    print(f"Total number of normal objects: {fake_car_count + fake_ped_count + fake_cyc_count} / {fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count}({total_percentage:.2f}%)")
+    print(f"Total number of fake objects: {(fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count)-(fake_car_count + fake_ped_count + fake_cyc_count)} / {fake_car_count + real_car_count + fake_ped_count + real_ped_count + fake_cyc_count + real_cyc_count}({total_percentage:.2f}%)")
     logger.info('Attack Detection Complete.')
     return box_data
 
