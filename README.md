@@ -35,6 +35,8 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 - *sn2_final.py* : Run sn2_1stage.py, sn2_2stage.py, and sn2_filter.py sequentially to measure the detection performance → Attack Scenario 2
 
+- *scenario2_fp_tp.py* : Measure TP and FP in Scenario 2 (folders needed for before attack, after attack, and after detection).
+
 ## Code to create fake objects
 
 **(1) Attack Scenario 1**
@@ -65,4 +67,4 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 - *scenario2_check.py* : Save only the injected fake objects that are detected by the object detection algorithm.
 
-- *scenario2_fp_tp.py* : Measure TP and FP in Scenario 2 (folders needed for before attack, after attack, and after detection).
+
