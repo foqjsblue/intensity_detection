@@ -65,6 +65,10 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
   Specify the bounding box file path in the box_path option and the background file path in the data_path option.
 
+
+  https://drive.google.com/drive/folders/1gQ59N3uZadEMh3tZi23WgA_poLet2dR3?usp=drive_link
+
+
 - *scenario2_check.py* : Save only the injected fake objects that are detected by the object detection algorithm.
 
 
