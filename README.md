@@ -23,9 +23,9 @@ Download the [KITTI Dataset](https://www.cvlibs.net/datasets/kitti/eval_object.p
 
 - *reflector.py* : Output the distribution of retroreflector intensity within the bounding boxes of the normal dataset compared to the entire bounding box.
 
-- *save_box_fake.py* : Stage 1 (Threshold-based Classification)
+- *stage_1.py* : Stage 1 (Threshold-based Classification)
 
-  Configure save_box_fake.py to receive the folder containing boxes classified as attack in stage2 as input.
+  Configure stage_1.py to receive the folder containing boxes classified as attack in stage2 as input.
 
 - *pytorch_kitti/main.py* : Stage2 (DGCNN-based Classification)
 
