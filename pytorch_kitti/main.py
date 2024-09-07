@@ -55,17 +55,17 @@ def custom_collate_fn(batch):
 def train(args, io):
     print("Training mode")
     train_directories = [
-        '/mnt/d/kitti_box/box_car/training/box_car_train',
-        '/mnt/d/kitti_box/box_car/training/box_car_train_rotate',
-        '/mnt/d/kitti_box/box_ped/training/box_ped_train',
-        '/mnt/d/kitti_box/box_cyc/training/box_cyc_train',
-        '/mnt/d/kitti_box/box_car/training/s1/car_train_rd02710_s1',
-        '/mnt/d/kitti_box/box_ped/training/s1/ped_train_rd02710_s1',
-        '/mnt/d/kitti_box/box_cyc/training/s1/cyc_train_rd02710_s1',
-        '/mnt/d/materials/fgsm/3.save_fake/fake_car_pgd_sc',
-        '/mnt/d/materials/fgsm/3.save_fake/fake_car_pgd_pp',
-        '/mnt/d/materials/fgsm/3.save_fake/fake_car_pgd_sc_rotate',
-        '/mnt/d/materials/fgsm/3.save_fake/fake_car_pgd_pp_rotate'
+        '/training/box_car_train',
+        '/training/box_car_train_rotate',
+        '/training/box_ped_train',
+        '/training/box_cyc_train',
+        '/training/s1/box_car_train_rd02710_s1',
+        '/training/s1/box_ped_train_rd02710_s1',
+        '/training/s1/box_cyc_train_rd02710_s1',
+        '/opt_training/fake_car_pgd_sc',
+        '/opt_training/fake_car_pgd_pp',
+        '/opt_training/fake_car_pgd_sc_rotate',
+        '/opt_training/fake_car_pgd_pp_rotate'
     ]
 
     train_loader = DataLoader(
@@ -75,14 +75,12 @@ def train(args, io):
         batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=custom_collate_fn)
 
     test_directories = [
-        '/mnt/d/kitti_box/box_car/testing/box_car_test',
-        '/mnt/d/kitti_box/box_ped/testing/box_ped_test',
-        '/mnt/d/kitti_box/box_cyc/testing/box_cyc_test',
-        '/mnt/d/kitti_box/box_car/testing/box_car_test_rd02710',
-        '/mnt/d/kitti_box/box_ped/testing/box_ped_test_rd02710',
-        '/mnt/d/kitti_box/box_cyc/testing/box_cyc_test_rd02710',
-        '/mnt/d/materials/fgsm/3.save_fake/fake_car_fgsm_sc_all',
-        '/mnt/d/materials/fgsm/3.save_fake/fake_car_fgsm_pp'
+        '/testing/box_car_test',
+        '/testing/box_ped_test',
+        '/testing/box_cyc_test',
+        '/testing/box_car_test_rd02710',
+        '/testing/box_ped_test_rd02710',
+        '/testing/box_cyc_test_rd02710'
     ]
 
     test_loader = DataLoader(KITTIDataset(directories=test_directories, num_points=args.num_points,
